@@ -19,6 +19,7 @@ namespace H5AngualrPlot
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseUrls("http://*:5100")
                 .UseStartup<Startup>()
                 .Build();
     }

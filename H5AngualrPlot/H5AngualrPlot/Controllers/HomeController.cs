@@ -16,31 +16,31 @@ namespace H5AngualrPlot.Controllers
         }
         [HttpPost]
 
-        public async Task<JsonResult> List(IEnumerable<QueryModel> querys)
+        public JsonResult List([FromBody]IEnumerable<QueryModel> querys)
         {
 
-         var   canvasModel = new MainCanvasModel();
-            var res = await canvasModel.InitData(querys.ToList());
+            var canvasModel = new MainCanvasModel();
+            var res = canvasModel.InitData(querys.ToList());
 
             return Json(res);
         }
 
         [HttpPost]
-        public async Task<JsonResult> Grid(IEnumerable<QueryModel> querys)
+        public JsonResult Grid([FromBody]IEnumerable<QueryModel> querys)
         {
-          var  gridModel = new GridModel();
+            var gridModel = new GridModel();
 
-            var res = await gridModel.LoadGrids(querys.ToList());
+            var res = gridModel.LoadGrids(querys.ToList());
             return Json(res);
 
 
         }
 
         [HttpPost]
-        public async Task<JsonResult> Search(string id)
+        public JsonResult Search(string id)
         {
-           var tagModel = new TagMainModel();
-            var list = await tagModel.GetTagList("%" + id + "%");
+            var tagModel = new TagMainModel();
+            var list = tagModel.GetTagList(id);
             return Json(list);
         }
         public IActionResult About()

@@ -141,6 +141,11 @@
                     nodes.push(new model(item, "", "", ""));
                 })
             }
+            else {
+                nodes.push(new model("LYB#H145.PV", "", "", ""));
+                nodes.push(new model("LYB#H147.PV", "", "", ""));
+              
+            }
             if (typeof (search.TagColor) != "undefined") {
                 var arrColors = search.TagColor.split('|');
                 for (var c in arrColors) {
@@ -170,7 +175,7 @@
                     var minDate = moment(startDates[0]);
                     for (var c in startDates) {
                         nodes[c].Start = startDates[c];
-                       
+
                     }
                     nodes.forEach(function (item) {
                         item.OffsetValue = moment(item.Start).diff(minDate, 'seconds');

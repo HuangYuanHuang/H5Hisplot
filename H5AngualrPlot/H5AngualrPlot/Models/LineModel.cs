@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using HanaTechHisPlot.HanaTechWCFService;
 using System.Threading.Tasks;
 
 namespace H5AngualrPlot.Models
@@ -69,11 +68,11 @@ namespace H5AngualrPlot.Models
     public class LineDataNode : IComparer<LineDataNode>
     {
 
-      
+
         public string Time { get; set; }
 
         public string ValueStr { get; set; }
-    
+
         public float Value
         {
             get
@@ -86,7 +85,7 @@ namespace H5AngualrPlot.Models
             }
         }
 
-     
+
         public string Confidence { get; set; }
         public int Compare(LineDataNode x, LineDataNode y)
         {
@@ -108,62 +107,65 @@ namespace H5AngualrPlot.Models
 
 
 
-        public async Task<MainCanvasModel> InitData(List<QueryModel> listParam)
+        public MainCanvasModel InitData(List<QueryModel> listParam)
         {
-            //判断是否url参数同位号比对 时间参数偏移
-            //bool isSameCompare = false;
-            //if (listParam.GroupBy(d => d.TagName).Count() > 0)
-            //{
-            //    isSameCompare = true;
-            //}
 
-            List<QueryParam> query = new List<QueryParam>();
 
             foreach (var item in listParam)
             {
-                var temp = new QueryParam()
-                {
-                    位号名称 = item.TagName,
 
-                };
-                if (item.Start?.Length > 5)
+                if (string.IsNullOrEmpty(item.Start))
                 {
-                    temp.开始日期 = DateTime.Parse(item.Start).AddSeconds(item.OffsetValue).ToString("yyyy-MM-dd HH:mm:ss");
-                    temp.结束日期 = DateTime.Parse(item.End).AddSeconds(item.OffsetValue).ToString("yyyy-MM-dd HH:mm:ss");
-
+                    item.Start = DateTime.Now.AddHours(-2).ToString("yyyy-MM-dd HH:mm:ss");
                 }
-                else
+                if (string.IsNullOrEmpty(item.End))
                 {
-                    temp.开始日期 = DateTime.Now.AddMinutes(-120).AddSeconds(item.OffsetValue).ToString("yyyy-MM-dd HH:mm:ss");
-                    temp.结束日期 = DateTime.Now.AddSeconds(item.OffsetValue).ToString("yyyy-MM-dd HH:mm:ss");
+                    item.End = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 }
-                item.Start = temp.开始日期;
-                item.End = temp.结束日期;
-                query.Add(temp);
             }
-
-            Dictionary<string, List<TagValueList>> list = new Dictionary<string, List<TagValueList>>(); ;
-
-            try
-            {
-                list = await Task<Dictionary<string, List<TagValueList>>>.Factory.FromAsync(WcfClient.BeginGetTagProcessDataListByMap,
-                                   WcfClient.EndGetTagProcessDataListByMap, query, null);
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"WCF获取数据ERROR:{ex.Message}");
-            }
-
             List<LineModel> listRes = new List<LineModel>();
             int index = 0;
+         
+            if (listParam?.Count == 0)
+            {
+                return new MainCanvasModel()
+                {
+                    StartTime = DateTime.Now.AddHours(-2).ToString("yyyy-MM-dd HH:mm:ss"),
+                    EndTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    Lines = listRes
+
+
+                };
+            }
+            Func< QueryModel, Random,List < LineDataNode>> getData = (node, rand) =>
+            {
+                List<LineDataNode> listNode = new List<LineDataNode>();
+                var start = DateTime.Parse(node.Start);
+                var end = DateTime.Parse(node.End);
+                int secondes = 30;
+                if ((end - start).TotalSeconds > 3600 * 24 * 4)
+                {
+                    secondes = (int)((end - start).TotalSeconds)/800;
+                }
+                while (start <= end)
+                {
+                    listNode.Add(new LineDataNode()
+                    {
+                        Confidence = "Confidence",
+                        Time = start.ToString("yyyy-MM-dd HH:mm:ss"),
+                        ValueStr = $"{Math.Cos(rand.Next(1, 10)) * rand.Next(1, 10) * 10}"
+
+                    });
+                    start = start.AddSeconds(secondes);
+                }
+
+
+                return listNode;
+            };
             foreach (var item in listParam)
             {
                 var key = item.ToString();
-                if (!list.ContainsKey(key))
-                {
-                    continue;
-                }
+
                 if (index > DefaultColors.Length - 1)
                 {
                     break;
@@ -176,25 +178,21 @@ namespace H5AngualrPlot.Models
                     TagName = item.TagName,
                     AutoMinMax = item.AutoMinMax,
                     Color = item.Color?.Length < 1 ? DefaultColors[index++] : item.Color,
-                    Data = list[key].Select(d => new LineDataNode() { Time = DateTime.Parse(d.位号值时间).AddSeconds(-item.OffsetValue).ToString("yyyy-MM-dd HH:mm:ss"), ValueStr = d.位号值, Confidence = d.可信度 }).Where(d => d.ValueStr != "非数字").ToList()
+                    Data = getData(item, new Random((int)DateTime.Now.Ticks))
 
                 };
+                Task.Delay(100);
                 temp.SetMinMaxValue(item.AutoMinMax, item.Min, item.Max);
                 listRes.Add(temp);
 
             }
 
-            index = 0;
-            foreach (var item in query)
-            {
-                //item.开始日期 = DateTime.Parse(item.开始日期).AddSeconds(isSameCompare ? 0 : -listParam[index].OffsetValue).ToString();
-                item.开始日期 = DateTime.Parse(item.开始日期).AddSeconds(-listParam[index].OffsetValue).ToString();
-                item.结束日期 = DateTime.Parse(item.结束日期).AddSeconds(-listParam[index++].OffsetValue).ToString();
-            }
+
+
             var resMain = new MainCanvasModel()
             {
-                StartTime = query.Min(d => d.开始日期),
-                EndTime = query.Max(d => d.结束日期),
+                StartTime = listParam.Min(d => d.Start),
+                EndTime = listParam.Max(d => d.End),
                 Lines = listRes
 
 
