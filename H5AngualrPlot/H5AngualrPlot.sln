@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H5AngualrPlot", "H5AngualrPlot\H5AngualrPlot.csproj", "{F927DDD0-475B-4524-B51A-C102C9A5DEB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F927DDD0-475B-4524-B51A-C102C9A5DEB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F927DDD0-475B-4524-B51A-C102C9A5DEB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F927DDD0-475B-4524-B51A-C102C9A5DEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F927DDD0-475B-4524-B51A-C102C9A5DEB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E7C65CD4-7C7C-4304-8624-D9337539A7A1}
+	EndGlobalSection
+EndGlobal
